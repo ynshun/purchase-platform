@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.softisland.client.product.mapper.ProductServiceMapper">
+
+    <resultMap id="BaseResultMap" type="com.softisland.entity.product.ProductServices">
+		<id column="id" jdbcType="BIGINT" property="id" />
+	</resultMap>
+
+	<select id="queryListByPage" resultType="com.softisland.entity.product.vo.ProductServicesVo">
+		select 
+			a.id,
+			a.status,
+			a.p_number,
+			a.p_name,
+			a.second_type_id,
+			a.update_time,
+			a.create_time,
+			a.update_id,
+			a.update_name,
+			a.create_id,
+			a.create_name,
+			a.content,
+			(select file_url from file_center where id=a.p_image) p_image,
+			a.first_type_id,
+			a.is_c_service_id,
+			a.is_num_buy,
+			a.reg_rate,
+			a.spe_rate,
+			a.p_content,
+			(select file_url from file_center where id=a.p_wap_image) p_wap_image,
+			a.cost_price,
+			a.is_custom_price,
+			a.input_code,
+			a.p_subtitle,
+			a.custom_start,
+			a.custom_end,
+			IFNULL(b.type,'') second_type
+		from product_service a left join business_type b
+		on a.second_type_id = b.id
+		WHERE
+		a.status = 1
+		<if test="p_name != null and p_name !='' ">
+			and a.p_name like CONCAT('%',#{p_name},'%')
+		</if>
+		<if test="input_code != null and input_code !='' ">
+			and a.input_code like CONCAT('%',#{input_code},'%')
+		</if>
+		<if test="first_type_id != null and first_type_id != 0 ">
+			and a.first_type_id = #{first_type_id}
+		</if>
+
+		<if test="second_type_id != null and second_type_id != 0 ">
+			and a.second_type_id = #{second_type_id}
+		</if>
+		<if test="ip_limit != null">
+			and a.ip_limit = 0
+		</if>
+		order by #{orderColumn} #{orderDir}
+	</select>
+	
+	
+	<select id="queryListForPage" resultType="com.softisland.entity.product.vo.ProductServicesVo">
+		select 
+			a.id,
+			a.status,
+			a.p_number,
+			a.p_name,
+			a.second_type_id,
+			a.update_time,
+			a.create_time,
+			a.update_id,
+			a.update_name,
+			a.create_id,
+			a.create_name,
+			a.content,
+			(select file_url from file_center where id=a.p_image) p_image,
+			a.first_type_id,
+			a.is_c_service_id,
+			a.is_num_buy,
+			a.reg_rate,
+			a.spe_rate,
+			a.p_content,
+			(select file_url from file_center where id=a.p_wap_image) p_wap_image,
+			a.cost_price,
+			a.is_custom_price,
+			a.input_code,
+			a.p_subtitle,
+			a.custom_start,
+			a.custom_end,
+			IFNULL(b.type,'') second_type
+		from product_service a left join business_type b
+		on a.second_type_id = b.id
+		WHERE
+		a.status = 1
+		<if test="input_code != null and input_code !='' ">
+			and a.input_code like CONCAT('%',#{input_code},'%')
+		</if>
+		<if test="first_type_id != null and first_type_id != 0 ">
+			and a.first_type_id = #{first_type_id}
+		</if>
+		<if test="second_type_id != null and second_type_id != 0 ">
+			and a.second_type_id = #{second_type_id}
+		</if>
+		<if test="ip_limit != null and ip_limit == 'true' ">
+			and a.ip_limit = 0
+		</if>
+		order by input_code asc
+		<if test="page_size != null and page_size != 0 ">
+			limit ${start_page} , ${page_size}
+		</if>
+	</select>
+	
+	<select id="queryListForPageCount" resultType="java.lang.Integer">
+		select 
+			count(1)
+		from product_service a left join business_type b
+		on a.second_type_id = b.id
+		WHERE
+		a.status = 1
+		<if test="input_code != null and input_code !='' ">
+			and a.input_code like CONCAT('%',#{input_code},'%')
+		</if>
+		<if test="first_type_id != null and first_type_id != 0 ">
+			and a.first_type_id = #{first_type_id}
+		</if>
+		<if test="second_type_id != null and second_type_id != 0 ">
+			and a.second_type_id = #{second_type_id}
+		</if>
+		<if test="ip_limit != null and ip_limit == 'true' ">
+			and a.ip_limit = 0
+		</if>
+		order by input_code asc
+	</select>
+
+</mapper>

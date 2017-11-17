@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.softisland.client.business.mapper.BackListMapper">
+
+    <resultMap id="BaseResultMap" type="com.softisland.entity.business.BusinessBackList">
+		<id column="id" jdbcType="BIGINT" property="id" />
+	</resultMap>
+
+ 	<select id="checkBackList" resultType="java.lang.Integer" >
+        	SELECT
+				count(1)
+			FROM
+				business_back_list
+			WHERE
+				status = 1
+			and (1=2 
+		<!-- 购买邮箱 -->
+		<if test="pay_email != null and pay_email != ''">
+			or content = #{pay_email}
+		</if>
+		<!-- 用户邮箱 -->
+		<if test="user_email != null and user_email != ''">
+			or content = #{user_email}
+		</if>
+		<!-- IP地址 -->
+		<if test="ip != null and ip != ''">
+			or content = #{ip}
+		</if>
+		<!-- 递送账户 -->
+		<if test="delivery_account != null and delivery_account != ''">
+			or content = #{delivery_account}
+		</if>
+		<!-- 递送名称 -->
+		<if test="delivery_name != null and delivery_name != ''">
+			or account_name = #{delivery_name}
+		</if>
+        )
+    </select>
+
+</mapper>

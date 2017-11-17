@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.softisland.client.product.mapper.ProductSpecMapper">
+
+    <resultMap id="BaseResultMap" type="com.softisland.entity.product.ProductSpec">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+    </resultMap>
+
+    <select id="queryProductSpeName" resultType="com.softisland.entity.product.vo.ProductSpecVo" parameterType="com.softisland.entity.product.query.ProductSpecQuery">
+        SELECT
+			a.id,
+			a.p_id,
+			a.name,
+			a.spec_num,
+			c.id price_id
+		FROM
+			product_spec a
+		JOIN site_vs_product b ON a.id = b.spec_id
+		JOIN product_price c ON b.price_id = c.id
+		WHERE
+		a.`status` = 1
+        and b.`status` = 1
+        and c.`status` = 1
+        <if test="p_id != null and p_id != 0 ">
+        and a.p_id = #{p_id}
+        </if>
+        <if test="site_id != null and site_id != 0 ">
+        and b.site_id = #{site_id}
+        </if>
+        and c.sale_price > 0
+    </select>
+    <select id="querySpecPrice" resultType="com.softisland.entity.product.vo.ProductSpecVo">
+       SELECT a.id, a.`name`, a.spec_num, c.sale_price,c.special_price
+        FROM product_spec a
+        JOIN site_vs_product b
+        ON a.id = b.spec_id
+        JOIN product_price c
+        ON b.price_id = c.id
+
+        WHERE a.`status` = 1
+        AND b.`status` = 1
+        AND c.`status` = 1
+        AND a.p_id = #{p_id}
+        AND b.site_id = #{site_id}
+        AND c.sale_price > 0
+
+        ORDER BY spec_num ASC
+
+    </select>
+
+</mapper>

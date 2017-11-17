@@ -1,0 +1,53 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.softisland</groupId>
+		<artifactId>purchase-platform</artifactId>
+		<version>0.0.1</version>
+	</parent>
+	<artifactId>purchase-common</artifactId>
+	<name>公共组件-华人充值新平台</name>
+	
+	<repositories>
+		<repository>
+			<id>ynshun repository</id>
+			<name>UCenter And Payment Api</name>
+			<url>http://172.16.20.112:8081/content/repositories/central/</url>
+		</repository>
+	</repositories>
+		
+	<dependencies>
+		<dependency>
+			<groupId>softisland-util</groupId>
+			<artifactId>ucenter-util</artifactId>
+			<version>2.0.11</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-collections</groupId>
+			<artifactId>commons-collections</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>commons-httpclient</groupId>
+			<artifactId>commons-httpclient</artifactId>
+			<version>3.1</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-pool</groupId>
+			<artifactId>commons-pool</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpcore</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>tk.mybatis</groupId>
+			<artifactId>mapper-spring-boot-starter</artifactId>
+			<version>RELEASE</version>
+		</dependency>
+	</dependencies>
+</project>

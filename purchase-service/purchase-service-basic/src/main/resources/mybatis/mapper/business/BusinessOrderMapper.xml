@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.softisland.client.business.mapper.BusinessOrderMapper">
+
+    <resultMap id="BaseResultMap" type="com.softisland.entity.business.BusinessOrder">
+		<id column="id" jdbcType="BIGINT" property="id" />
+	</resultMap>
+
+	<select id="queryAll" resultType="com.softisland.entity.business.BusinessOrder" parameterType="com.softisland.entity.business.query.BusinessOrderQuery">
+		<![CDATA[
+			select b.*  from business_order b,business_order_delivery bo where b.id=bo.order_id
+		]]>
+		<if test="status!=null and status!=''">
+			<![CDATA[
+				and b.status=#{status}
+			]]>
+		</if>
+		<if test="startTime!=null and startTime!=''">
+			<![CDATA[
+				and b.startTime>=#{startTime}
+			]]>
+		</if>
+		<if test="endTime!=null and endTime!=''">
+			<![CDATA[
+				and b.endTime<=#{endTime}
+			]]>
+		</if>
+		<if test="site!=null and site!=''">
+			<![CDATA[
+				and b.site_id = #{site}
+			]]>
+		</if>
+		<if test="payWay!=null and payWay!=''">
+			<![CDATA[
+				and b.pay_id = #{payWay}
+			]]>
+		</if>
+		<if test="payStatus!=null and payStatus!=''">
+			<![CDATA[
+				and b.pay_status = #{payStatus}
+			]]>
+		</if>
+		<if test="deliverStatus!=null and deliverStatus!=''">
+			<![CDATA[
+				and b.deliver_status = #{deliverStatus}
+			]]>
+		</if>
+		<if test="replyStatus!=null and replyStatus!=''">
+			<![CDATA[
+				and b.reply_status = #{replyStatus}
+			]]>
+		</if>
+		<if test="orderId!=null and orderId!=''">
+			<![CDATA[
+				and b.id = #{orderId}
+			]]>
+		</if>
+		<if test="tradeNo!=null and tradeNo!=''">
+			<![CDATA[
+				and b.trader_no = #{tradeNo}
+			]]>
+		</if>
+		<if test="buyerEmail!=null and buyerEmail!=''">
+			<![CDATA[
+				and b.buyer_email = #{buyerEmail}
+			]]>
+		</if>
+		<if test="regEmail!=null and regEmail!=''">
+			<![CDATA[
+				and b.user_email = #{regEmail}
+			]]>
+		</if>
+		<if test="rechargeAccount!=null and rechargeAccount!=''">
+			<![CDATA[
+				and bo.content  CONCAT('%','${rechargeAccount}','%' )
+			]]>
+		</if>
+
+		<if test="rechargeName!=null and rechargeName!=''">
+			<![CDATA[
+				and b.content  CONCAT('%','${rechargeName}','%' )
+			]]>
+		</if>
+
+		<if test="source!=null and source!=''">
+			<![CDATA[
+				and b.source_name = #{source}
+			]]>
+		</if>
+
+	</select>
+	
+	
+	<select id="queryContentInfoByPid"  resultType="com.softisland.entity.business.BusinessOrder">
+		SELECT
+			*
+		FROM
+			business_order
+		WHERE
+			user_id = #{user_id}
+		AND p_id = #{p_id}
+		ORDER BY
+			create_time DESC
+		LIMIT 1
+	</select>
+	
+	<!-- 统计用户的不良记录订单数量 -->
+	<select id="countUnHealthy" resultType="java.lang.Integer">
+		SELECT
+			count(1) as total
+		FROM
+			business_order
+		WHERE
+			user_id = #{user_id}
+			and reply_status IN (
+				'AFC',
+				'PD ',
+				'Refund ',
+				'CBUS',
+				'CB ',
+				'Fax',
+				'IV',
+				'DS',
+				'DP',
+				'MB-Cancel'
+			)
+	</select>
+	
+	<!-- 查询用户是否使用过paypal支付，返回第一次成功支付的时间 -->
+	<select id="queryPaypalFirstCompleted" resultType="java.lang.String">
+		SELECT
+			create_time
+		FROM
+			business_order
+		WHERE
+			user_id = #{user_id}
+		AND pay_id IN (1, 2)
+		AND pay_time IS NOT NULL
+		AND pay_status = 'Completed'
+		ORDER BY
+			create_time asc
+		LIMIT 1
+	</select>
+	<!-- 获取用户最近一次支付成功使用的支付方式 -->
+	<select id="queryNearestCompletedPayId" resultType="java.lang.Integer">
+		select pay_id from business_order where user_id  = #{user_id} and pay_status ='Completed' order by pay_time desc limit 1
+	</select>
+	<!-- 	获取用户历史金额 -->
+	<select id="getHistoryOrderAmount" resultType="java.lang.Double">
+		select sum(final_money / pay_to_usd_rate) history_amount from business_order where user_id  = #{user_id} AND (pay_status='Completed' or pay_status='YES') AND pay_id IN (1, 2)
+	</select>
+</mapper>

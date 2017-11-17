@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.softisland.client.site.mapper.SiteVsProductMapper">
+
+    <resultMap id="BaseResultMap" type="com.softisland.entity.site.SiteVsProduct">
+		<id column="id" jdbcType="BIGINT" property="id" />
+	</resultMap>
+	
+	<select id="indexSearchProduct" resultType="java.lang.Integer">
+		SELECT DISTINCT
+			a.id
+		FROM
+			product_service a,
+			site_vs_product b,
+			business_type c,
+			business_type d
+		WHERE
+		IF (
+			a.second_type_id > 0,
+			a.second_type_id = d.id
+		AND d.status = 1,
+		 '1=1'
+		)
+		AND a.id = b.p_id
+		AND a.status = 1
+		AND a.first_type_id = c.id
+		AND c.status = 1
+		AND b.site_id = #{siteId}
+		AND a.p_name LIKE CONCAT('%',#{searchProduct}, '%')
+		<if test="isChinaIp">
+			AND a.ip_limit = 0
+		</if>
+	</select>
+	
+</mapper>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.softisland.client.business.mapper.BusinessCurrencyMapper">
+
+    <resultMap id="BaseResultMap" type="com.softisland.entity.business.BusinessCurrency">
+		<id column="id" jdbcType="BIGINT" property="id" />
+	</resultMap>
+	
+	
+	<select id="getList" resultType="com.softisland.entity.business.vo.BusinessCurrencyVo">
+		SELECT DISTINCT
+			id,
+			currency_code,
+			currency_name,
+			currency_icon
+		FROM
+			(
+				(
+					SELECT
+						id,
+						currency_code,
+						currency_name,
+						currency_icon
+					FROM
+						business_currency
+					WHERE
+						currency_code = 'CNY'
+				)
+				UNION ALL
+					(
+						SELECT DISTINCT
+							a.id,
+							a.currency_code,
+							a.currency_name,
+							a.currency_icon
+						FROM
+							business_currency a,
+							business_pay_currency b,
+							business_pay c,
+							site_pay d
+						WHERE
+							d.pay_id = c.id
+						AND c.id = b.pay_id
+						AND b.currency_id = a.id
+						AND a. STATUS = 1
+						AND c. STATUS = 1
+						AND d.site_id = #{site_id}
+						ORDER BY
+							a.sort DESC
+					)
+			) t
+	</select>
+
+</mapper>

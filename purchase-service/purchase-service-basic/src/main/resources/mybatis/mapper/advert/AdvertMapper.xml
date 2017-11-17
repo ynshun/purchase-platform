@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.softisland.client.advert.mapper.AdvertMapper">
+
+    <resultMap id="BaseResultMap" type="com.softisland.entity.advert.Advert">
+		<id column="id" jdbcType="BIGINT" property="id" />
+	</resultMap>
+
+ 	<select id="list" resultType="com.softisland.entity.advert.AdvertVo" >
+ 		select 
+			ba.language,
+			bat.`name`,
+			fc.file_url,
+			ba.link,
+			bat.site_id,
+			ba.title
+		from business_advert ba
+			LEFT JOIN business_advert_type bat on ba.type_id = bat.id and bat.site_id = #{site_id}
+			LEFT JOIN file_center fc on ba.file_id = fc.id
+		where 
+				ba.`status` = 1
+			and bat.`status` = 1
+			and bat.type_id = #{type_id}
+ 		order by ba.order_no desc
+    </select>
+
+</mapper>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.softisland.client.news.mapper.NewsTypeMapper">
+
+    <resultMap id="BaseResultMap" type="com.softisland.entity.news.NewsType">
+		<id column="id" jdbcType="BIGINT" property="id" />
+	</resultMap>
+
+ 	<select id="queryNewsTypeByNews" resultType="com.softisland.entity.news.NewsType" >
+ 		select * from business_news_type bnt
+			INNER JOIN business_news bn on bn.type_id = bnt.id and bn.id = #{news_id}
+    </select>
+    
+</mapper>

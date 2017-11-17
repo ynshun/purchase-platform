@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.softisland.client.order.mapper.TransactionMapper">
+
+    <resultMap id="BaseResultMap" type="com.softisland.entity.business.BusinessTransaction">
+		<id column="id" jdbcType="BIGINT" property="id" />
+	</resultMap>
+	
+	
+	<select id="selectByOrderId" resultType="com.softisland.entity.business.BusinessTransaction">
+		select * from business_transaction where order_id=#{order_id} order by create_time desc limit 1
+	</select>
+	
+
+</mapper>

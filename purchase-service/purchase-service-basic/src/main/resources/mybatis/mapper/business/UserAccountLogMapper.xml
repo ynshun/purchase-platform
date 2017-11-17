@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.softisland.client.business.mapper.UserAccountLogMapper">
+
+    <resultMap id="BaseResultMap" type="com.softisland.entity.business.UserAccountLog">
+		<id column="id" jdbcType="BIGINT" property="id" />
+	</resultMap>
+
+	<select id="getListByAccountId" resultType="com.softisland.entity.business.vo.UserAccountLogVo">
+		SELECT
+			id,
+			order_id,
+			DATE_FORMAT(create_time,'%Y.%m.%d %H:%i:%s') create_time,
+			operate_type,
+			money,
+			after_money,
+			remark
+		FROM
+			user_account_log
+		WHERE
+			account_id = #{account_id} and operate_type not in (5,7)
+		ORDER BY
+			create_time DESC
+	</select>
+</mapper>

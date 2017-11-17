@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.softisland.client.business.mapper.BusinessReferenceMapper">
+
+    <resultMap id="BaseResultMap" type="com.softisland.entity.business.BusinessReference">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+    </resultMap>
+
+    <select id="getReferenceId" resultType="com.softisland.entity.business.BusinessReference" >
+        SELECT  IFNULL(id,0) AS id
+        FROM reference
+        WHERE locate(key_word,#{referenceUrl})>0
+        AND `STATUS` = 1
+        ORDER BY id ASC
+        LIMIT 0,1;
+    </select>
+
+</mapper>

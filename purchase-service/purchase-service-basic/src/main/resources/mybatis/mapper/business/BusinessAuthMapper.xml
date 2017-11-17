@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.softisland.client.business.mapper.BusinessAuthMapper">
+
+    <resultMap id="BaseResultMap" type="com.softisland.entity.auth.BusinessAuth">
+		<id column="id" jdbcType="BIGINT" property="id" />
+	</resultMap>
+	
+	
+	<select id="getList" resultType="com.softisland.entity.auth.vo.BusinessAuthClientVo">
+		SELECT
+			id,
+			paypal_email,
+			auth_desc,
+			status
+		FROM
+			business_auth
+		WHERE
+			user_id = #{user_id}
+		ORDER BY
+			create_time DESC
+	</select>
+
+</mapper>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.softisland.client.business.mapper.BusinessDiscountMapper">
+
+    <resultMap id="BaseResultMap" type="com.softisland.entity.business.BusinessDiscount">
+		<id column="id" jdbcType="BIGINT" property="id" />
+	</resultMap>
+
+ 	<select id="queryListByPage" resultType="com.softisland.entity.business.vo.BusinessDiscountVo"
+            parameterType="com.softisland.entity.business.vo.BusinessDiscountVo">
+        	select 
+				id,
+				begin_time,
+				end_time,
+				min_money,
+				max_money,
+				discount_code,
+				discount_rate,
+				total_times,
+				used_times,
+				remark,
+				status,
+				create_id,
+				create_name,
+				create_time,
+				update_id,
+				update_name,
+				update_time,
+				site_id,
+				business_type_id,
+				is_limit_business
+			from 
+				business_discount
+			where 1=1
+		<if test="discount_code != null and discount_code !=''">
+			and discount_code = #{discount_code}
+		</if>
+        <if test="create_id != null and create_id !='-1' ">
+            and create_id = #{create_id}
+        </if>
+        order by ${orderColumn} ${orderDir}
+    </select>
+
+</mapper>

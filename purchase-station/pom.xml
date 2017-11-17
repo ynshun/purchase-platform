@@ -1,0 +1,30 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<packaging>pom</packaging>
+	<parent>
+		<groupId>com.softisland</groupId>
+		<artifactId>purchase-platform</artifactId>
+		<version>0.0.1</version>
+	</parent>
+	<artifactId>purchase-station</artifactId>
+	<name>站点-华人充值新平台</name>
+
+	<modules>
+		<module>www.vpayfast.com</module>
+		<module>wap.vpayfast.com</module>
+	</modules>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.softisland</groupId>
+			<artifactId>purchase-common</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.softisland</groupId>
+			<artifactId>purchase-domain</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
+</project>

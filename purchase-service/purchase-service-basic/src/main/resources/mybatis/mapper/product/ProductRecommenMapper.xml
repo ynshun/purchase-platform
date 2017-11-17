@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.softisland.client.product.mapper.ProductRecommenMapper">
+
+    <resultMap id="BaseResultMap" type="com.softisland.entity.product.ProductRecommend">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+    </resultMap>
+
+
+    <select id="queryListByPage" resultType="com.softisland.entity.product.vo.ProductRecommenVoList">
+		SELECT
+			p.id AS productId,
+			p.first_type_id,
+			p.second_type_id,
+			p.p_name,
+			ps.name,
+			ps.id AS specId,
+			pc.id AS priceId,
+			pc.site_id AS siteId,
+			pc.sale_price,
+			pc.special_price,
+			p.p_image p_image
+		FROM
+			product_service p,
+			product_spec ps,
+			product_price pc,
+			product_recommend pr
+		WHERE
+			pr.product_spec_id = ps.id
+		AND pr.price_id = pc.id
+		AND pr.product_id = p.id
+		AND p.status = 1
+		AND ps.status = 1
+		AND pc.status = 1
+		AND pr.status = 1
+    <if test="name!=null and name !=''">
+        and ps.`name` like CONCAT('%',#{name},'%')
+    </if>
+    <if test="siteId!=null and siteId !=''">
+        AND pc.site_id = #{siteId}
+		AND pr.site_id = #{siteId}
+    </if>
+    <if test="first_type_id!=null and first_type_id !=''">
+        and p.first_type_id = #{first_type_id}
+    </if>
+    <if test="second_type_id!=null and second_type_id !=''">
+        and p.second_type_id = #{second_type_id}
+    </if>
+		order by #{orderColumn} #{orderDir} limit 0, 20
+    </select>
+</mapper>

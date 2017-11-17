@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.softisland.client.order.mapper.OrderMapper">
+
+	<resultMap id="BaseResultMap" type="com.softisland.entity.business.BusinessOrder">
+		<id column="id" jdbcType="BIGINT" property="id" />
+	</resultMap>
+
+	<resultMap type="com.softisland.entity.business.vo.MyOrderVo"
+		id="MyOrderMap">
+		<id column="id" jdbcType="BIGINT" property="id" />
+	</resultMap>
+
+	<resultMap type="com.softisland.entity.business.vo.MyOrderResultVo"
+		id="MyOrderResultMap">
+		<id column="id" jdbcType="BIGINT" property="id" />
+	</resultMap>
+
+	<resultMap type="com.softisland.entity.business.vo.TopUpVo"
+		id="TopUpMap">
+		<id column="id" jdbcType="BIGINT" property="id" />
+	</resultMap>
+
+	<select id="checkDistanceFirstOrderDate" resultType="java.lang.Integer">
+		SELECT
+		datediff(now(), create_time) as datediff
+		FROM business_order
+		WHERE
+		create_time IS NOT NULL
+		and user_id = #{user_id}
+		ORDER BY create_time ASC
+		LIMIT 0, 1
+	</select>
+
+	<select id="checkPeriodDateExceedAmount" resultType="java.lang.Double">
+		SELECT
+		IFNULL(SUM(final_money / pay_to_usd_rate), 0) AS SUM_AMOUNT
+		FROM
+		business_order
+		WHERE
+		(pay_status = 'Completed' OR pay_status = 'YES')
+		AND user_id = #{user_id}
+		AND create_time IS NOT NULL
+		AND DATEDIFF(NOW(), create_time) &lt; #{period}
+		AND DATEDIFF(NOW(), create_time) &gt;= 0
+	</select>
+
+
+	<select id="getDelivery" resultType="java.lang.String">
+		SELECT
+		a.delivery_value
+		FROM
+		business_order_delivery a,
+		product_delivery_info b
+		WHERE
+		b.use_type = #{use_type}
+		and a.delivery_id=b.id
+		<if test="order_id != null and order_id != '' ">
+			AND a.order_id =#{order_id}
+		</if>
+		<if test="deliver_value != null and deliver_value != '' ">
+			and a.delivery_value = #{deliver_value}
+		</if>
+		<if test="exclude_order_id != null and exclude_order_id != '' ">
+			and a.order_id != #{exclude_order_id}
+		</if>
+		limit 0, 1
+	</select>
+
+	<select id="getOrderByUserId" resultMap="BaseResultMap">
+		select * from business_order where status != -1 and user_id=#{user_id} 
+		<if test="site_id != null and site_id != '' ">
+			and (site_id = #{site_id} or site_id = #{myorder_site_id})
+		</if> 
+		 order by id desc
+	</select>
+	
+
+	<select id="queryNewOrderByStatus" resultMap="BaseResultMap">
+		SELECT * from
+		business_order where user_id=#{user_id} AND pay_status='Completed' AND
+		deliver_status='FINI' AND reply_status='YES' ORDER BY update_time desc
+		LIMIT 1
+	</select>
+
+	<select id="getMyOrderById" resultMap="MyOrderMap">
+		SELECT
+			b.p_name,
+			a.id,
+			a.order_type,
+			a.create_time,
+			a.pay_time,
+			a.pay_status,
+			a.deliver_status,
+			a.reply_status,
+			a.p_id,
+			a.wx_picture_url,
+			a.pay_id,
+			d.jump_url,
+			e.currency_icon,
+			round (a.settle_money, 2) AS settle_money,
+			round (a.this_fee, 2) AS this_fee,
+			round (a.final_money, 2) AS final_money,
+			round (a.cost_price, 2) AS cost_price,
+			a.pay_to_usd_rate,
+			(SELECT log.content from business_order_log log where log.order_id = a.id AND log.log_type = 1 AND log.after_status = 'WL' AND a.deliver_status = 'WL' ORDER BY log.operate_time desc limit 1) as deliver_message
+		FROM business_order a
+		LEFT JOIN product_service b ON a.p_id = b.id
+		LEFT JOIN business_pay d ON a.pay_id = d.id
+		LEFT JOIN business_currency e ON a.settle_currency = e.currency_code
+		WHERE a.status != -1 and a.user_id = #{user_id}
+		<if test="site_id != null and site_id != '' ">
+			and (site_id = #{site_id} or site_id = #{myorder_site_id})
+		</if>
+		ORDER BY a.create_time DESC LIMIT #{start}, 10
+	</select>
+
+	<select id="myOrderResult" resultMap="MyOrderResultMap">
+		select
+		o.id,TRUNCATE(o.final_money,2) as
+		final_money,p.pay_name,c.currency_icon, o.settle_currency
+		from
+		business_order o,business_pay p, business_currency c
+		where
+		o.pay_id=p.id
+		and c.currency_code = o.settle_currency
+		and o.id=#{id}
+	</select>
+
+
+	<!-- 定时查询可以发货的订单 -->
+	<select id="timingdelivery" resultMap="BaseResultMap">
+		select * from
+		business_order a JOIN business_transaction b on a.id = b.order_id
+		where a.reply_status='YES' AND A.deliver_status='NO' AND(a.p_id =
+		#{wx} or a.p_id=#{zfb} OR a.order_type=2)
+	</select>
+	<!-- 根据订单Id获取订单详情 -->
+	<select id="getOrderDetailByOrderId" resultType="com.softisland.entity.business.vo.OrderDetailVo">
+		select
+		CONCAT(spec_name,'*',buy_number)
+		spec_name_str,unit_price,spec_name,buy_number from
+		business_order_detail where order_id = #{orderId}
+	</select>
+	<!-- 根据供应商id查询订单列表 -->
+	<select id="queryOrderByAffId" parameterType="HashMap"
+		resultType="com.softisland.entity.business.vo.MyOrderVo">
+		SELECT
+		GROUP_CONCAT(detail.spec_name) AS 'spec_name',
+		b.p_name,
+		a.id,
+		a.order_type,
+		a.create_time,
+		a.pay_status,
+		a.deliver_status,
+		a.reply_status,
+		a.p_id,
+		a.wx_picture_url,
+		a.pay_id,
+		d.jump_url,
+		e.currency_icon,
+		round (a.settle_money, 2) AS settle_money,
+		round (a.this_fee, 2) AS this_fee,
+		round (a.final_money, 2) AS final_money,
+		round (a.cost_price, 2) AS cost_price,
+		a.pay_to_usd_rate
+		FROM
+		business_order a
+		LEFT JOIN product_service b ON a.p_id = b.id
+		LEFT JOIN business_pay d
+		ON a.pay_id = d.id
+		LEFT JOIN business_currency e ON a.settle_currency =
+		e.currency_code
+		LEFT JOIN business_order_detail detail ON
+		detail.order_id = a.id
+		WHERE
+		a.affiliate_id=#{affid}
+		and a.reply_status='YES'
+		and a.pay_status ='Completed'
+		and a.deliver_status ='FINI'
+		<if test="start_time != null and start_time != '' ">
+			AND <![CDATA[ a.create_time >= #{start_time} ]]>
+		</if>
+		<if test="end_time != null and end_time != '' ">
+			AND <![CDATA[ a.create_time < DATE_ADD(#{end_time},INTERVAL 1 DAY) ]]>
+		</if>
+		GROUP BY a.id
+		ORDER BY a.create_time DESC
+	</select>
+</mapper>

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.softisland.client.business.mapper.BusinessPayMapper">
+
+    <resultMap id="BaseResultMap" type="com.softisland.entity.business.BusinessPay">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+    </resultMap>
+
+	<select id="queryBySiteIdAndCurrencyCode" resultType="com.softisland.entity.business.vo.BusinessPayClientVo">
+	    SELECT
+			a.*
+		FROM
+			business_pay a,
+			business_pay_currency b,
+			business_currency c,
+			site_pay d
+		WHERE
+			a.id = b.pay_id
+		AND b.currency_id = c.id
+		AND a.id = d.pay_id
+		and c.currency_code = #{currency_code}
+		and d.site_id = #{site_id}
+		and a.status =1
+		and c.status =1
+		order by a.is_num_by 
+	</select>
+	
+	<select id="queryBySiteIdAndCurrencyCodeForPayId" resultType="com.softisland.entity.business.vo.BusinessPayClientVo">
+		SELECT
+			a.id,
+			a.pay_name,
+			a.pay_image_url,
+			a.pay_desc,
+			a.min_money,
+			a.max_money,
+			a.fee_money,
+			a.create_id,
+			a.create_name,
+			a.create_time,
+			a.update_id,
+			a.update_name,
+			a.update_time,
+			0 as is_num_by,
+			a.status,
+			a.pay_mode_code,
+			a.country,
+			a.jump_url
+		FROM
+			business_pay a,
+			business_pay_currency b,
+			business_currency c,
+			site_pay d
+		WHERE
+			a.id = b.pay_id
+		AND b.currency_id = c.id
+		AND a.id = d.pay_id
+		and c.currency_code = #{currency_code}
+		and d.site_id = #{site_id}
+		and a.status =1
+		and c.status =1
+		AND a.id = #{pay_id}
+		UNION All
+		SELECT
+			a1.id,
+			a1.pay_name,
+			a1.pay_image_url,
+			a1.pay_desc,
+			a1.min_money,
+			a1.max_money,
+			a1.fee_money,
+			a1.create_id,
+			a1.create_name,
+			a1.create_time,
+			a1.update_id,
+			a1.update_name,
+			a1.update_time,
+			a1.is_num_by as is_num_by,
+			a1.status,
+			a1.pay_mode_code,
+			a1.country,
+			a1.jump_url
+		FROM
+			business_pay a1,
+			business_pay_currency b1,
+			business_currency c1,
+			site_pay d1
+		WHERE
+			a1.id = b1.pay_id
+		AND b1.currency_id = c1.id
+		AND a1.id = d1.pay_id
+		and c1.currency_code = #{currency_code}
+		and d1.site_id = #{site_id}
+		and a1.status =1
+		and c1.status =1
+		AND a1.id != #{pay_id}
+		order by is_num_by 
+	</select>
+</mapper>

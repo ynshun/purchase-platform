@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.softisland.client.news.mapper.NewsMapper">
+
+    <resultMap id="BaseResultMap" type="com.softisland.entity.news.News">
+		<id column="id" jdbcType="BIGINT" property="id" />
+	</resultMap>
+
+ 	<select id="queryNewsList" resultType="com.softisland.entity.news.News" >
+ 		SELECT
+			bn.id,
+			bn.news_time,
+			bn.title,
+			bnt.name as type_name
+		FROM
+			BUSINESS_NEWS bn
+		LEFT JOIN BUSINESS_NEWS_TYPE bnt on bnt.id = bn.type_id
+		WHERE bn.status = 1
+		<if test="null != type_id">
+			AND bnt.type_id = #{type_id} 
+		</if>
+		<if test="null != notExistsId">
+			AND bnt.type_id != #{notExistsId}
+		</if>
+		  AND bnt.site_id = #{site_id} 
+		  AND bnt.status = 1
+		ORDER BY ${orderColumn} ${orderDir}
+    </select>
+    
+    <select id="queryNextNews" resultType="com.softisland.entity.news.News" >
+    	select 
+			bn.id,
+			bn.news_time,
+			bn.title from business_news bn
+		LEFT JOIN BUSINESS_NEWS_TYPE bnt on bnt.id = bn.type_id
+		WHERE bn.status = 1
+		  AND bnt.status = 1
+		  <if test="null != type_id">
+			AND bnt.type_id = #{type_id} 
+		  </if>
+		  <if test="null != notExistsId">
+			AND bnt.type_id != #{notExistsId}
+		  </if>
+		  
+		  AND bnt.site_id = #{site_id}
+		  AND bn.news_time &lt;= (select news_time from business_news where id = #{id}) and bn.id != #{id}
+		ORDER BY bn.news_time desc
+		LIMIT 0, 1
+    </select>
+
+</mapper>

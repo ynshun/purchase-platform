@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.softisland.client.product.mapper.BusinessTypeMapper">
+
+    <resultMap id="BaseResultMap" type="com.softisland.entity.product.BusinessType">
+		<id column="id" jdbcType="BIGINT" property="id" />
+	</resultMap>
+
+	<select id="queryListByPage" resultType="com.softisland.entity.product.vo.BusinessTypeVo">
+		select a.*,b.type parentType
+		from business_type a LEFT JOIN business_type b
+		on a.parent_type_id = b.id
+		WHERE
+		a.`status` != -1
+		<if test="type != null and type !='' ">
+			and a.type like CONCAT('%',#{type},'%')
+		</if>
+
+		<if test="typeid != null and typeid == 1 ">
+			and a.parent_type_id = 0
+		</if>
+
+		<if test="typeid != null and typeid > 1 ">
+			and  a.parent_type_id > 0
+		</if>
+
+		order by #{orderColumn} #{orderDir}  limit 0,10
+	</select>
+
+	<select id="selectOrder" resultType="int" parameterType="int">
+		select ifnull(max(sort),0) from business_type
+	    where parent_type_id = #{parentid}
+	</select>
+
+
+	<select id="getIndexBusinessType" resultType="com.softisland.entity.product.vo.IndexBusinessTypeVo">
+		SELECT
+			type_id id,
+			b.type name,
+			ifnull(b.type_image,'') icon
+		FROM
+			site_business_type a,
+			business_type b
+		WHERE
+			a.type_id = b.id
+		AND a.status = 1
+		AND b.status = 1
+		AND site_id = #{site_id} 
+		ORDER BY
+			a.sort DESC
+		LIMIT ${limitNum}
+	</select>
+		
+	<select id="getIndexBusinessTypeIP" resultType="com.softisland.entity.product.vo.IndexBusinessTypeVo">
+		SELECT
+			type_id id,
+			b.type name,
+			ifnull(b.type_image,'') icon
+		FROM
+			site_business_type a,
+			business_type b
+		WHERE
+			a.type_id = b.id
+		AND a.status = 1
+		AND b.status = 1
+		AND b.ip_limit = 0
+		AND site_id = #{site_id} 
+		ORDER BY
+			a.sort DESC
+		LIMIT ${limitNum}
+	</select>
+</mapper>

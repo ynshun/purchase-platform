@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.softisland.client.business.mapper.BusinessProductDeliverDetailMapper">
+
+    <resultMap id="BaseResultMap" type="com.softisland.entity.business.BusinessProductDeliverDetail">
+		<id column="id" jdbcType="BIGINT" property="id" />
+	</resultMap>
+
+	<select id="queryDetail" resultType="com.softisland.entity.business.vo.BusinessProductDeliverDetailVo">
+		SELECT
+			a.delivery_id,a.delivery_value, b.NAME delivery_name
+		FROM
+			business_product_deliver_detail a,
+			product_delivery_info b
+		WHERE
+			a.delivery_id = b.id
+		AND a.product_deliver_id = #{product_deliver_id}
+	</select>
+</mapper>
